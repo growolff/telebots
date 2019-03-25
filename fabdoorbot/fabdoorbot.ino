@@ -18,12 +18,12 @@ WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 
 
-const long utcOffsetInSeconds = -3 * 3600;
-WiFiUDP ntpUDP;
+//const long utcOffsetInSeconds = -3 * 3600;
+//WiFiUDP ntpUDP;
 // You can specify the time server pool and the offset (in seconds, can be
 // changed later with setTimeOffset() ). Additionaly you can specify the
 // update interval (in milliseconds, can be changed using setUpdateInterval() ).
-NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds, 60000);
+//NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds, 60000);
 
 
 int Bot_mtbs = 500; //mean time between sccan messages
@@ -39,7 +39,7 @@ int onceADay = false;
 int count = 0;
 
 AdafruitIO_Feed *id = io.feed("fabdoorbotid","growolff");
-AdafruitIO_Feed *counter = io.feed("fabdoorbotcount","growolff");
+//AdafruitIO_Feed *counter = io.feed("fabdoorbotcount","growolff");
 
 void handleNewMessages(int numNewMessages) {
   Serial.println("handleNewMessages");
@@ -83,13 +83,13 @@ void handleNewMessages(int numNewMessages) {
       digitalWrite(ledPin, LOW);
       bot.sendMessage(user_id, "Puerta abierta :)" , "");
       id->save(user_id);
-    }
+    }/*
     if (text == "/count"){
       String txt1 = "Door opened ";
       String txt2 = " times until now.";
       String msg = txt1 + count + txt2;
       bot.sendMessage(user_id, msg, "");
-    }/*
+    }
     if (text == "/count@fabdoorbot"){
       String txt1 = "Door opened ";
       String txt2 = " times until now.";
@@ -117,7 +117,7 @@ void handleNewMessages(int numNewMessages) {
       String welcome = "Welcome to FabDoorBot interface, " + from_name + ".\n";
       welcome += "Using me you can: \n\n";
       welcome += "/open : open the door\n";
-      welcome += "/count : get number of clicks until now, reset at 20hrs \n";
+      //welcome += "/count : get number of clicks until now, reset at 20hrs \n";
       bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
@@ -160,12 +160,12 @@ void setup() {
     delay(500);
   }
 
-  timeClient.begin();
+  //timeClient.begin();
 }
 
 
 void loop() {
-  timeClient.update();
+  //timeClient.update();
   io.run();
 
   if (millis() > Bot_lasttime + Bot_mtbs)  {
@@ -180,7 +180,7 @@ void loop() {
 
     Bot_lasttime = millis();
   }
-
+/*
   if (timeClient.getHours() == 20 && onceADay == false){
     counter->save(count);
     count = 0;
@@ -188,7 +188,7 @@ void loop() {
   }
   if (timeClient.getHours() > 20){
     onceADay = false;
-  }
+  }*/
 
-  delay(Bot_mtbs);
+  //delay(Bot_mtbs);
 }
