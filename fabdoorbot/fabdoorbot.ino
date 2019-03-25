@@ -1,8 +1,8 @@
 /*******************************************************************
-   An example of bot that echos back any messages received
+   Telegram Bot for Fablab U. de Chile door access and 
+   data harvesting
 *                                                                  *
-   written by Giacarlo Bacchio (Gianbacchio on Github)
-   adapted by Brian Lough
+   written by Gonzalo Olave
 *******************************************************************/
 #include "fabDoorToken.h"
 
@@ -17,6 +17,15 @@ char password[] = WIFI_PASS; // your network key
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 
+
+const long utcOffsetInSeconds = -3 * 3600;
+WiFiUDP ntpUDP;
+// You can specify the time server pool and the offset (in seconds, can be
+// changed later with setTimeOffset() ). Additionaly you can specify the
+// update interval (in milliseconds, can be changed using setUpdateInterval() ).
+NTPClient timeClient(ntpUDP, "pool.ntp.org", utcOffsetInSeconds, 60000);
+
+
 int Bot_mtbs = 500; //mean time between sccan messages
 long Bot_lasttime;   //last time messages' scan has been done
 bool Start = false;
@@ -25,9 +34,9 @@ const int ledPin = D0;
 const int pirPin = D3;
 int ledStatus = 0;
 
-int PIRsensor = 0;
+int onceADay = false;
 
-unsigned int count=0;
+int count = 0;
 
 AdafruitIO_Feed *id = io.feed("fabdoorbotid","growolff");
 AdafruitIO_Feed *counter = io.feed("fabdoorbotcount","growolff");
@@ -75,6 +84,18 @@ void handleNewMessages(int numNewMessages) {
       bot.sendMessage(user_id, "Puerta abierta :)" , "");
       id->save(user_id);
     }
+    if (text == "/count"){
+      String txt1 = "Door opened ";
+      String txt2 = " times until now.";
+      String msg = txt1 + count + txt2;
+      bot.sendMessage(user_id, msg, "");
+    }/*
+    if (text == "/count@fabdoorbot"){
+      String txt1 = "Door opened ";
+      String txt2 = " times until now.";
+      String msg = txt1 + count + txt2;
+      bot.sendMessage(user_id, msg, "");
+    }*/
 /*
     if (text == "/get") { // get PIR sensor status
       if (PIRsensor == 1) {
@@ -95,9 +116,8 @@ void handleNewMessages(int numNewMessages) {
     if (text == "/start") {
       String welcome = "Welcome to FabDoorBot interface, " + from_name + ".\n";
       welcome += "Using me you can: \n\n";
-      welcome += "/open : to open the door\n";
-      welcome += "/open@fabdoorbot : to open the door in group chats\n";
-      welcome += "/status : Returns counter at night\n";
+      welcome += "/open : open the door\n";
+      welcome += "/count : get number of clicks until now, reset at 20hrs \n";
       bot.sendMessage(chat_id, welcome, "Markdown");
     }
   }
@@ -139,11 +159,14 @@ void setup() {
     Serial.print(".");
     delay(500);
   }
+
+  timeClient.begin();
 }
 
+
 void loop() {
+  timeClient.update();
   io.run();
-  //PIRsensor = digitalRead(pirPin);
 
   if (millis() > Bot_lasttime + Bot_mtbs)  {
     //Serial.println(PIRsensor);
@@ -157,4 +180,15 @@ void loop() {
 
     Bot_lasttime = millis();
   }
+
+  if (timeClient.getHours() == 20 && onceADay == false){
+    counter->save(count);
+    count = 0;
+    onceADay = true;
+  }
+  if (timeClient.getHours() > 20){
+    onceADay = false;
+  }
+
+  delay(Bot_mtbs);
 }
