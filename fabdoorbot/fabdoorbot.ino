@@ -30,8 +30,7 @@ int Bot_mtbs = 500; //mean time between sccan messages
 long Bot_lasttime;   //last time messages' scan has been done
 bool Start = false;
 
-const int ledPin = D0;
-const int pirPin = D3;
+const int ledPin = D1;
 int ledStatus = 0;
 
 int onceADay = false;
@@ -73,7 +72,7 @@ void handleNewMessages(int numNewMessages) {
       delay(1000);
       digitalWrite(ledPin,LOW);
       bot.sendMessage(user_id, "Puerta abierta :)" , "");
-      id->save(user_id);
+      //id->save(user_id);
     }
 
     if (text == "/open@fabdoorbot") {
@@ -82,7 +81,7 @@ void handleNewMessages(int numNewMessages) {
       delay(1000);
       digitalWrite(ledPin, LOW);
       bot.sendMessage(user_id, "Puerta abierta :)" , "");
-      id->save(user_id);
+      //id->save(user_id);
     }/*
     if (text == "/count"){
       String txt1 = "Door opened ";
@@ -153,21 +152,22 @@ void setup() {
   digitalWrite(ledPin, LOW); // initialize pin as off
 
   // connect to io.adafruit.com
-  io.connect();
+//  io.connect();
   // wait for a connection
-  while(io.status() < AIO_CONNECTED) {
-    Serial.print(".");
-    delay(500);
-  }
+  //while(io.status() < AIO_CONNECTED) {
+   // Serial.print(".");
+    //delay(500);
+ // }
 
   //timeClient.begin();
+  delay(100);
 }
 
 
 void loop() {
   //timeClient.update();
-  io.run();
-
+  //io.run();
+  Serial.println("ASDASDASD");
   if (millis() > Bot_lasttime + Bot_mtbs)  {
     //Serial.println(PIRsensor);
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
@@ -190,5 +190,5 @@ void loop() {
     onceADay = false;
   }*/
 
-  //delay(Bot_mtbs);
+  delay(Bot_mtbs);
 }
