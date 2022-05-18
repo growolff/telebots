@@ -13,8 +13,9 @@
 X509List cert(TELEGRAM_CERTIFICATE_ROOT);
 #endif
 
-const int num_user = 3;
-const char* users[num_user] = {ID_GROW, ID_VCR, ID_JUC};
+const int num_user = USER_COUNT;
+const char* users[num_user] = {ID_GROW, ID_VCR, ID_JUC, ID_ANT, ID_DPM, ID_UWU, ID_RFC, ID_ALE,
+                               ID_MEKERO_CRIS, ID_MEKERO_DANI, ID_MEKERO_BORIS};
 
 // Initialize Telegram BOT
 WiFiClientSecure client;
